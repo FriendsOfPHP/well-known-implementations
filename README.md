@@ -19,9 +19,9 @@ might enable better integration in debugging panels for example.
 
 By requiring "friendsofphp/well-known-implementations" instead of
 "php-http/guzzle7-adapter", SDK maintainers can provide ideal experiences:
-because this package is also a composer-plugin (*TODO*), it will auto-install an
-actual implementation of the required abstraction when none is already installed,
-or reuse it if one is found.
+because this package is also a composer-plugin, it will auto-install an actual
+implementation of the required abstraction when none is already installed, or
+reuse it if one is found.
 
 In their constructors, SDKs should then reference the provided "well-known"
 classes and they will get whatever implementation is available:

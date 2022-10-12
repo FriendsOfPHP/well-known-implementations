@@ -23,6 +23,8 @@
         "composer-runtime-api": "^2.1"
     },
     "require-dev": {
+        "composer/composer": "^2.1",
+        "nyholm/psr7": "^1",
         "php-http/httplug": "^1|^2",
         "psr/http-client": "^1",
         "psr/http-factory": "^1",
@@ -39,10 +41,14 @@
         "guzzlehttp/psr7": "<1.4",
         "laminas/laminas-diactoros": "<2",
         "php-http/curl-client": "<2",
-        "php-http/react-adapter": "<3"
+        "php-http/react-adapter": "<3",
+        "symfony/http-client": "<4.4"
     },
     "config": {
         "sort-packages": true
+    },
+    "extra": {
+        "class": "FriendsOfPHP\\WellKnownImplementations\\Internal\\ComposerPlugin"
     },
     "minimum-stability": "dev"
 }

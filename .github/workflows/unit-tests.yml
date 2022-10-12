@@ -70,6 +70,7 @@ jobs:
       - name: Install dependencies
         run: |
           echo "::group::composer update"
+          composer remove --ansi --no-update --dev nyholm/psr7
           composer require --ansi --no-update guzzlehttp/promises php-http/message-factory ${{ matrix.psr7 }} ${{ matrix.client }}
           composer update --ansi
           echo "::endgroup::"
