@@ -238,6 +238,20 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             }
         }
 
+        if (!isset($allPackages['nyholm/psr7'])) {
+            foreach ($missingRequires as $dev => $abstractions) {
+                if (\in_array('nyholm/psr7', $missingRequires[$dev]['psr/http-factory-implementation'] ?? [], true)) {
+                    continue;
+                }
+                foreach ($abstractions as $abstraction => $deps) {
+                    if (\in_array('symfony/http-client', $deps, true)) {
+                        $missingRequires[$dev][$abstraction][] = 'php-http/discovery';
+                        continue 2;
+                    }
+                }
+            }
+        }
+
         $missingRequires[1] = array_diff_key($missingRequires[1], $missingRequires[0]);
 
         return $missingRequires;

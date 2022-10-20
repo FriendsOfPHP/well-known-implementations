@@ -18,13 +18,14 @@
         "psr/http-message-implementation": "*"
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.2",
         "composer-plugin-api": "^2.1",
         "composer-runtime-api": "^2.1"
     },
     "require-dev": {
         "composer/composer": "^2.1",
         "nyholm/psr7": "^1",
+        "php-http/discovery": "^1",
         "php-http/httplug": "^1|^2",
         "psr/http-client": "^1",
         "psr/http-factory": "^1",
@@ -42,7 +43,7 @@
         "laminas/laminas-diactoros": "<2",
         "php-http/curl-client": "<2",
         "php-http/react-adapter": "<3",
-        "symfony/http-client": "<4.4"
+        "symfony/http-client": "<5.4"
     },
     "config": {
         "sort-packages": true

@@ -9,26 +9,21 @@
 
 namespace FriendsOfPHP\WellKnownImplementations\Internal\Symfony;
 
-use FriendsOfPHP\WellKnownImplementations\WellKnownPsr17Factory;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
  * @internal
  */
-class SymfonyPsr18Client implements ClientInterface
-{
-    private $client;
+class_alias(Psr18Client::class, SymfonyPsr18Client::class);
 
-    public function __construct()
+if (false) {
+    /**
+     * @internal
+     */
+    class SymfonyPsr18Client extends Psr18Client
     {
-        $this->client = new Psr18Client(null, new WellKnownPsr17Factory());
-    }
-
-    public function sendRequest(RequestInterface $request): ResponseInterface
-    {
-        return $this->client->sendRequest($request);
+        public function __construct()
+        {
+        }
     }
 }

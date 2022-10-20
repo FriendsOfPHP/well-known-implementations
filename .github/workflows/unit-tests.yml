@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.1'
+          - '7.2'
           - '8.1'
         psr7:
           - guzzlehttp/psr7
@@ -40,13 +40,13 @@ jobs:
           - php: '8.1'
             client: php-http/guzzle7-adapter
             psr7: guzzlehttp/psr7
-          - php: '7.1'
+          - php: '7.2'
             client: php-http/guzzle6-adapter
-            psr7: guzzlehttp/psr7
+            psr7: guzzlehttp/psr7:^1.9
           - php: '8.1'
             client: php-http/react-adapter
             psr7: nyholm/psr7
-          - php: '7.1'
+          - php: '7.2'
             client: php-http/react-adapter
             psr7: nyholm/psr7
       fail-fast: false
