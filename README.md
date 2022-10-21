@@ -45,6 +45,14 @@ instantiate them.
 Althought not required most of the time, you can check which implementation is
 used by using the `ConcreteImplementation::*_VENDOR` constants.
 
+The logic to decide which implementation should be installed relies on the
+packages that are already found in a project. For example, if one is using
+`react/event-loop`, the plugin will select `php-http/react-adapter` (the rules
+are declared in `ComposerPlugin`; they're open for discussion.) The missing
+packages will be added to the project's composer.json file. This makes it easy
+to override the choices of the plugin by explicitly requiring the preferred
+implementations.
+
 As of now, the following abstractions are supported:
  - php-http/async-client-implementation
  - php-http/client-implementation
