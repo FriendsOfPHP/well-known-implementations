@@ -15,7 +15,7 @@ use Http\Client\HttpClient;
 if (null !== $vendor = ConcreteImplementation::HTTPLUG_VENDOR) {
     class_alias(Internal::class."\\{$vendor}\\{$vendor}HttplugClient", WellKnownHttplugClient::class);
 } else {
-    throw new \LogicException('Supported Httplug implementation not found, try running "composer require symfony/http-client".');
+    throw new \LogicException('Cannot find any of the well-known HTTPlug implementations; please "composer require" one of them.');
 }
 
 if (false) {

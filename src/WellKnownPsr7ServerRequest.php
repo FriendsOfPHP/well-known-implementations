@@ -15,7 +15,7 @@ use Psr\Http\Message\UriInterface;
 if (null !== $vendor = ConcreteImplementation::PSR7_VENDOR) {
     class_alias(Internal::class."\\{$vendor}\\{$vendor}Psr7ServerRequest", WellKnownPsr7ServerRequest::class);
 } else {
-    throw new \LogicException('Supported PSR-7 implementation not found, try running "composer require nyholm/psr7".');
+    throw new \LogicException('Cannot find any of the well-known PSR-7 implementations; please "composer require" one of them.');
 }
 
 if (false) {

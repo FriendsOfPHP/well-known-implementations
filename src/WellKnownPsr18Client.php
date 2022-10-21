@@ -14,7 +14,7 @@ use Psr\Http\Client\ClientInterface;
 if (null !== $vendor = ConcreteImplementation::PSR18_VENDOR) {
     class_alias(Internal::class."\\{$vendor}\\{$vendor}Psr18Client", WellKnownPsr18Client::class);
 } else {
-    throw new \LogicException('Supported PSR-18 implementation not found, try running "composer require symfony/http-client".');
+    throw new \LogicException('Cannot find any of the well-known PSR-18 implementations; please "composer require" one of them.');
 }
 
 if (false) {
