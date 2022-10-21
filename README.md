@@ -38,6 +38,13 @@ class MySdk
 }
 ```
 
+All provided `WellKnown*` classes have standardized constructor signatures so
+that you don't need to care about which exact implementation is available to
+instantiate them.
+
+Althought not required most of the time, you can check which implementation is
+used by using the `ConcreteImplementation::*_VENDOR` constants.
+
 As of now, the following abstractions are supported:
  - php-http/async-client-implementation
  - php-http/client-implementation
@@ -54,8 +61,7 @@ And the following vendors are supported:
  - Slim
  - Symfony
 
-More abstractions / vendors can be added by contributions, e.g. for
-psr/log-implementation, psr/cache-implementation, psr/simple-cache-implementation.
+More abstractions / vendors can be added by contributions.
 
 If your favorite SDK does not use this package yet, please let them know about it
-or better: the send them a PR!
+or better: send them a PR!
