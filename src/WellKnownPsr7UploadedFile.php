@@ -9,7 +9,6 @@
 
 namespace FriendsOfPHP\WellKnownImplementations;
 
-use FriendsOfPHP\WellKnownImplementations\Internal\ConcreteImplementation;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 

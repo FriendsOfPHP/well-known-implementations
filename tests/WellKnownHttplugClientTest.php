@@ -9,9 +9,9 @@
 
 namespace FriendsOfPHP\WellKnownImplementations\Tests;
 
+use FriendsOfPHP\WellKnownImplementations\ConcreteImplementation;
 use FriendsOfPHP\WellKnownImplementations\WellKnownHttplugClient;
 use FriendsOfPHP\WellKnownImplementations\WellKnownPsr7Request;
-use FriendsOfPHP\WellKnownImplementations\Internal\ConcreteImplementation;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
 use PHPUnit\Framework\TestCase;

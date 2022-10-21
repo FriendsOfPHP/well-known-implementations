@@ -7,17 +7,17 @@
  * file that was distributed with this source code.
  */
 
-namespace FriendsOfPHP\WellKnownImplementations\Internal\PhpHttpGuzzle7;
+namespace FriendsOfPHP\WellKnownImplementations\Internal\HttplugReact;
 
-use Http\Adapter\Guzzle7\Client;
+use Http\Adapter\React\Client;
 
-class_alias(Client::class, PhpHttpGuzzle7HttplugClient::class);
+class_alias(Client::class, HttplugReactHttplugClient::class);
 
 if (false) {
     /**
      * @internal
      */
-    class PhpHttpGuzzle7HttplugClient extends Client
+    class HttplugReactHttplugClient extends Client
     {
         public function __construct()
         {

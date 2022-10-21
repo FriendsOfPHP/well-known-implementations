@@ -9,7 +9,6 @@
 
 namespace FriendsOfPHP\WellKnownImplementations;
 
-use FriendsOfPHP\WellKnownImplementations\Internal\ConcreteImplementation;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
 

@@ -9,7 +9,6 @@
 
 namespace FriendsOfPHP\WellKnownImplementations;
 
-use FriendsOfPHP\WellKnownImplementations\Internal\ConcreteImplementation;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 

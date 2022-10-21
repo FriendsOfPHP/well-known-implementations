@@ -9,9 +9,9 @@
 
 namespace FriendsOfPHP\WellKnownImplementations\Tests;
 
+use FriendsOfPHP\WellKnownImplementations\ConcreteImplementation;
 use FriendsOfPHP\WellKnownImplementations\WellKnownPsr18Client;
 use FriendsOfPHP\WellKnownImplementations\WellKnownPsr7Request;
-use FriendsOfPHP\WellKnownImplementations\Internal\ConcreteImplementation;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 

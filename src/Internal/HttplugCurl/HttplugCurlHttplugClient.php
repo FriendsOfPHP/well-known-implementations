@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace FriendsOfPHP\WellKnownImplementations\Internal\PhpHttpCurl;
+namespace FriendsOfPHP\WellKnownImplementations\Internal\HttplugCurl;
 
 use FriendsOfPHP\WellKnownImplementations\WellKnownPsr17Factory;
 use Http\Client\Curl\Client;
@@ -15,7 +15,7 @@ use Http\Client\Curl\Client;
 /**
  * @internal
  */
-class PhpHttpCurlHttplugClient extends Client
+class HttplugCurlHttplugClient extends Client
 {
     public function __construct()
     {

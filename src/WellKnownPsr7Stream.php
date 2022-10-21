@@ -9,7 +9,6 @@
 
 namespace FriendsOfPHP\WellKnownImplementations;
 
-use FriendsOfPHP\WellKnownImplementations\Internal\ConcreteImplementation;
 use Psr\Http\Message\StreamInterface;
 
 if (null !== $vendor = ConcreteImplementation::PSR7_VENDOR) {

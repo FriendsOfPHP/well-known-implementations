@@ -7,17 +7,17 @@
  * file that was distributed with this source code.
  */
 
-namespace FriendsOfPHP\WellKnownImplementations\Internal\PhpHttpGuzzle6;
+namespace FriendsOfPHP\WellKnownImplementations\Internal\HttplugGuzzle7;
 
-use Http\Adapter\Guzzle6\Client;
+use Http\Adapter\Guzzle7\Client;
 
-class_alias(Client::class, PhpHttpGuzzle6HttplugClient::class);
+class_alias(Client::class, HttplugGuzzle7HttplugClient::class);
 
 if (false) {
     /**
      * @internal
      */
-    class PhpHttpGuzzle6HttplugClient extends Client
+    class HttplugGuzzle7HttplugClient extends Client
     {
         public function __construct()
         {

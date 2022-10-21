@@ -26,8 +26,11 @@ use Composer\Repository\RepositorySet;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem;
+use FriendsOfPHP\WellKnownImplementations\ConcreteImplementation;
 
 /**
+ * @author Nicolas Grekas <p@tchwork.com>
+ *
  * @internal
  */
 class ComposerPlugin implements PluginInterface, EventSubscriberInterface
@@ -88,27 +91,33 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
     public function preAutoloadDump(Event $event)
     {
         $filesystem = new Filesystem();
-        $vendor = $filesystem->normalizePath(realpath(realpath($event->getComposer()->getConfig()->get('vendor-dir'))));
-        $filesystem->ensureDirectoryExists($vendor.'/composer');
+        $vendorDir = $filesystem->normalizePath(realpath(realpath($event->getComposer()->getConfig()->get('vendor-dir'))));
+        $filesystem->ensureDirectoryExists($vendorDir.'/composer');
 
         $repo = $event->getComposer()->getRepositoryManager()->getLocalRepository();
         $vendors = self::initializeConcreteImplementation($repo);
 
-        $namespace = __NAMESPACE__;
         $psr7Vendor = str_replace(['NULL', '\\\\'], ['null', '\\'], var_export(PSR7_VENDOR, true));
         $psr18Vendor = str_replace(['NULL', '\\\\'], ['null', '\\'], var_export(PSR18_VENDOR, true));
         $httplugVendor = str_replace(['NULL', '\\\\'], ['null', '\\'], var_export(HTTPLUG_VENDOR, true));
 
-        $filesystem->filePutContentsIfModified($vendor.'/composer/WellKnownConcreteImplementation.php', <<<EOPHP
+        natcasesort($vendors);
+        $vendorConsts = '';
+        foreach ($vendors as $vendor) {
+            $vendorConsts .= "\n    public const VENDOR".strtoupper(preg_replace('/[A-Z]++/', '_$0', $vendor)).' = '.var_export($vendor, true).';';
+        }
+
+        $filesystem->filePutContentsIfModified($vendorDir.'/composer/WellKnownConcreteImplementation.php', <<<EOPHP
 <?php
 
-namespace $namespace;
+namespace FriendsOfPHP\WellKnownImplementations;
 
 class ConcreteImplementation
 {
     public const PSR7_VENDOR = $psr7Vendor;
     public const PSR18_VENDOR = $psr18Vendor;
     public const HTTPLUG_VENDOR = $httplugVendor;
+$vendorConsts
 }
 
 EOPHP
@@ -116,7 +125,7 @@ EOPHP
 
         $rootPackage = $event->getComposer()->getPackage();
         $autoload = $rootPackage->getAutoload();
-        $autoload['classmap'][] = $vendor.'/composer/WellKnownConcreteImplementation.php';
+        $autoload['classmap'][] = $vendorDir.'/composer/WellKnownConcreteImplementation.php';
         $rootPackage->setAutoload($autoload);
 
         unset($vendors[PSR7_VENDOR], $vendors[PSR18_VENDOR], $vendors[HTTPLUG_VENDOR]);
@@ -126,8 +135,8 @@ EOPHP
                 continue;
             }
             $autoload = $package->getAutoload();
+            $autoload['exclude-from-classmap'][] = 'src/ConcreteImplementation.php';
             $autoload['exclude-from-classmap'][] = 'src/Internal/ComposerPlugin.php';
-            $autoload['exclude-from-classmap'][] = 'src/Internal/ConcreteImplementation.php';
             foreach ($vendors as $vendor) {
                 $autoload['exclude-from-classmap'][] = 'src/Internal/'.$vendor.'/';
             }
