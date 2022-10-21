@@ -27,8 +27,8 @@ class ConcreteImplementation
     public const VENDOR_HTTPLUG_REACT = 'HttplugReact';
     public const VENDOR_LAMINAS = 'Laminas';
     public const VENDOR_NYHOLM = 'Nyholm';
-    public const VENDOR_PHP_SLIM = 'Slim';
-    public const VENDOR_PHP_Symfony = 'Symfony';
+    public const VENDOR_SLIM = 'Slim';
+    public const VENDOR_SYMFONY = 'Symfony';
 
     /**
      * @internal
