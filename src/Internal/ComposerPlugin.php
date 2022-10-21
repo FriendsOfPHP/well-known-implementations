@@ -17,6 +17,7 @@ use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Json\JsonManipulator;
 use Composer\Package\Locker;
+use Composer\Package\Package;
 use Composer\Package\Version\VersionParser;
 use Composer\Package\Version\VersionSelector;
 use Composer\Plugin\PluginInterface;
@@ -24,6 +25,7 @@ use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Repository\RepositorySet;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
+use Composer\Util\Filesystem;
 
 /**
  * @internal
@@ -83,6 +85,56 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
     {
     }
 
+    public function preAutoloadDump(Event $event)
+    {
+        $filesystem = new Filesystem();
+        $vendor = $filesystem->normalizePath(realpath(realpath($event->getComposer()->getConfig()->get('vendor-dir'))));
+        $filesystem->ensureDirectoryExists($vendor.'/composer');
+
+        $repo = $event->getComposer()->getRepositoryManager()->getLocalRepository();
+        $vendors = self::initializeConcreteImplementation($repo);
+
+        $namespace = __NAMESPACE__;
+        $psr7Vendor = str_replace(['NULL', '\\\\'], ['null', '\\'], var_export(PSR7_VENDOR, true));
+        $psr18Vendor = str_replace(['NULL', '\\\\'], ['null', '\\'], var_export(PSR18_VENDOR, true));
+        $httplugVendor = str_replace(['NULL', '\\\\'], ['null', '\\'], var_export(HTTPLUG_VENDOR, true));
+
+        $filesystem->filePutContentsIfModified($vendor.'/composer/WellKnownConcreteImplementation.php', <<<EOPHP
+<?php
+
+namespace $namespace;
+
+class ConcreteImplementation
+{
+    public const PSR7_VENDOR = $psr7Vendor;
+    public const PSR18_VENDOR = $psr18Vendor;
+    public const HTTPLUG_VENDOR = $httplugVendor;
+}
+
+EOPHP
+        );
+
+        $rootPackage = $event->getComposer()->getPackage();
+        $autoload = $rootPackage->getAutoload();
+        $autoload['classmap'][] = $vendor.'/composer/WellKnownConcreteImplementation.php';
+        $rootPackage->setAutoload($autoload);
+
+        unset($vendors[PSR7_VENDOR], $vendors[PSR18_VENDOR], $vendors[HTTPLUG_VENDOR]);
+
+        foreach ($repo->getPackages() as $package) {
+            if ('friendsofphp/well-known-implementations' !== $package->getName() || !$package instanceof Package) {
+                continue;
+            }
+            $autoload = $package->getAutoload();
+            $autoload['exclude-from-classmap'][] = 'src/Internal/ComposerPlugin.php';
+            $autoload['exclude-from-classmap'][] = 'src/Internal/ConcreteImplementation.php';
+            foreach ($vendors as $vendor) {
+                $autoload['exclude-from-classmap'][] = 'src/Internal/'.$vendor.'/';
+            }
+            $package->setAutoload($autoload);
+        }
+    }
+
     public function postUpdate(Event $event)
     {
         $composer = $event->getComposer();
@@ -125,6 +177,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
 
         /** @var Installer $installer */
         $installer = clone $installer;
+        $trace['object']->setAudit(false);
         $installer->__construct(
             $event->getIO(),
             $composer->getConfig(),
@@ -276,6 +329,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            ScriptEvents::PRE_AUTOLOAD_DUMP => 'preAutoloadDump',
             ScriptEvents::POST_UPDATE_CMD => 'postUpdate',
         ];
     }
@@ -289,5 +343,42 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         $lockData = $locker->getLockData();
         $lockData['content-hash'] = Locker::getContentHash($composerJson);
         $lockFile->write($lockData);
+    }
+
+    private static function initializeConcreteImplementation(InstalledRepositoryInterface $repo): array
+    {
+        $vendors = [];
+
+        foreach (ConcreteImplementation::IMPLEMENTATIONS as $const => $packages) {
+            $vendors += $packages;
+            if (\defined(__NAMESPACE__."\\{$const}_VENDOR")) {
+                continue;
+            }
+            foreach ([false, true] as $includeDevRequirements) {
+                foreach ($packages as $namespace => $versions) {
+                    foreach ((array) $versions as $package => $version) {
+                        if (\is_int($package)) {
+                            $package = $version;
+                            $version = null;
+                        }
+                        if (!$includeDevRequirements && \in_array($package, $repo->getDevPackageNames(), true)) {
+                            continue 2;
+                        }
+                        if (!$repo->findPackage($package, null !== $version ? '>='.$version : '*')) {
+                            continue 2;
+                        }
+                    }
+                    \define(__NAMESPACE__."\\{$const}_VENDOR", $namespace);
+                    continue 3;
+                }
+            }
+            \define(__NAMESPACE__."\\{$const}_VENDOR", null);
+        }
+
+        foreach ($vendors as $vendor => $versions) {
+            $vendors[$vendor] = $vendor;
+        }
+
+        return $vendors;
     }
 }
