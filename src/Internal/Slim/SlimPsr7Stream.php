@@ -9,7 +9,7 @@
 
 namespace FriendsOfPHP\WellKnownImplementations\Internal\Slim;
 
-use FriendsOfPHP\WellKnownImplementations\Internal\Psr7StreamHelper;
+use FriendsOfPHP\WellKnownImplementations\Internal\Psr7Helper;
 use Slim\Psr7\Stream;
 
 /**
@@ -22,6 +22,6 @@ class SlimPsr7Stream extends Stream
      */
     public function __construct($content = '', string $mode = null)
     {
-        parent::__construct(Psr7StreamHelper::toResource($content, $mode));
+        parent::__construct(Psr7Helper::toResource($content, $mode));
     }
 }

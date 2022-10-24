@@ -9,6 +9,7 @@
 
 namespace FriendsOfPHP\WellKnownImplementations;
 
+use FriendsOfPHP\WellKnownImplementations\Internal\Psr7Helper;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -45,6 +46,19 @@ final class WellKnownPsr17Factory implements RequestFactoryInterface, ResponseFa
         return new WellKnownPsr7ServerRequest(...\func_get_args());
     }
 
+    public function createServerRequestFromGlobals(array $server = null, array $get = null, array $post = null, array $cookie = null, array $files = null, StreamInterface $body = null): ServerRequestInterface
+    {
+        $server = $server ?? $_SERVER;
+        $request = new WellKnownPsr7ServerRequest($server['REQUEST_METHOD'] ?? 'GET', $this->createUriFromGlobals($server), $server);
+
+        return Psr7Helper::buildServerRequestFromGlobals($request, $server, $files ?? $_FILES)
+            ->withQueryParams($get ?? $_GET)
+            ->withParsedBody($post ?? $_POST)
+            ->withCookieParams($cookie ?? $_COOKIE)
+            ->withBody($body ?? new WellKnownPsr7Stream('php://input', 'r+'));
+        ;
+    }
+
     public function createStream(string $content = ''): StreamInterface
     {
         return new WellKnownPsr7Stream($content);
@@ -71,5 +85,10 @@ final class WellKnownPsr17Factory implements RequestFactoryInterface, ResponseFa
     public function createUri(string $uri = ''): UriInterface
     {
         return new WellKnownPsr7Uri(...\func_get_args());
+    }
+
+    public function createUriFromGlobals(array $server = null): UriInterface
+    {
+        return Psr7Helper::buildUriFromGlobals(new WellKnownPsr7Uri(''), $server ?? $_SERVER);
     }
 }

@@ -9,7 +9,7 @@
 
 namespace FriendsOfPHP\WellKnownImplementations\Internal\Laminas;
 
-use FriendsOfPHP\WellKnownImplementations\Internal\Psr7StreamHelper;
+use FriendsOfPHP\WellKnownImplementations\Internal\Psr7Helper;
 use Laminas\Diactoros\Stream;
 
 /**
@@ -23,7 +23,7 @@ class LaminasPsr7Stream extends Stream
     public function __construct($content = '', string $mode = null)
     {
         if (null === $mode && \is_string($content)) {
-            $content = Psr7StreamHelper::toResource($content, $mode);
+            $content = Psr7Helper::toResource($content, $mode);
         }
 
         parent::__construct($content, $mode ?? 'r');

@@ -9,7 +9,7 @@
 
 namespace FriendsOfPHP\WellKnownImplementations\Internal\Nyholm;
 
-use FriendsOfPHP\WellKnownImplementations\Internal\Psr7StreamHelper;
+use FriendsOfPHP\WellKnownImplementations\Internal\Psr7Helper;
 use Nyholm\Psr7\Stream;
 
 /**
@@ -23,7 +23,7 @@ class NyholmPsr7Stream extends Stream
     public function __construct($content = '', string $mode = null)
     {
         if (!\is_resource($content)) {
-            $content = Psr7StreamHelper::toResource($content, $mode);
+            $content = Psr7Helper::toResource($content, $mode);
         }
 
         static $sync;
