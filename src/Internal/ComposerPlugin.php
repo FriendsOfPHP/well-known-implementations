@@ -153,10 +153,11 @@ EOPHP
             $composer->getPackage()->getDevRequires(),
         ];
 
-        $missingRequires = $this->getMissingRequires($repo, $requires);
+        $missingRequires = $this->getMissingRequires($repo, $requires, 'project' === $composer->getPackage()->getType());
         $missingRequires = [
             'require' => array_fill_keys(array_merge([], ...array_values($missingRequires[0])), '*'),
             'require-dev' => array_fill_keys(array_merge([], ...array_values($missingRequires[1])), '*'),
+            'remove' => array_fill_keys(array_merge([], ...array_values($missingRequires[2])), '*'),
         ];
 
         if (!$missingRequires = array_filter($missingRequires)) {
@@ -224,7 +225,7 @@ EOPHP
         }
     }
 
-    public function getMissingRequires(InstalledRepositoryInterface $repo, array $requires): array
+    public function getMissingRequires(InstalledRepositoryInterface $repo, array $requires, bool $isProject): array
     {
         $allPackages = [];
         $devPackages = array_flip($repo->getDevPackageNames());
@@ -234,9 +235,8 @@ EOPHP
             $requires[(int) isset($devPackages[$package->getName()])] += $package->getRequires();
         }
 
-
         $abstractions = [];
-        $missingRequires = [[], []];
+        $missingRequires = [[], [], []];
         $versionParser = new VersionParser();
 
         foreach ($requires as $dev => $rules) {
@@ -249,15 +249,25 @@ EOPHP
                     if (!isset($allPackages[$candidate])) {
                         continue;
                     }
-                    $missingRequires[$dev][$abstraction] = !$dev && isset($devPackages[$candidate]) ? [$candidate] : [];
+
+                    if ($isProject && !$dev && isset($devPackages[$candidate])) {
+                        $missingRequires[0][$abstraction] = [$candidate];
+                        $missingRequires[2][$abstraction] = [$candidate];
+                    } else {
+                        $missingRequires[$dev][$abstraction] = [];
+                    }
 
                     foreach ($deps as $dep) {
                         if (isset(self::PROVIDE_RULES[$dep])) {
                             $rules[$dep] = self::PROVIDE_RULES[$dep];
-                        } elseif (!isset($allPackages[$dep]) || (!$dev && isset($devPackages[$dep]))) {
+                        } elseif (!isset($allPackages[$dep])) {
                             $missingRequires[$dev][$abstraction][] = $dep;
+                        } elseif ($isProject && !$dev && isset($devPackages[$dep])) {
+                            $missingRequires[0][$abstraction][] = $dep;
+                            $missingRequires[2][$abstraction][] = $dep;
                         }
                     }
+                    break;
                 }
             }
 
@@ -270,14 +280,14 @@ EOPHP
                 $candidates = self::PROVIDE_RULES[$abstraction];
 
                 foreach ($candidates as $candidate => $deps) {
-                    if (isset($allPackages[$candidate]) && (!$dev || isset($devPackages[$candidate]))) {
+                    if (isset($allPackages[$candidate]) && (!$isProject || $dev || !isset($devPackages[$candidate]))) {
                         continue 2;
                     }
                 }
 
                 foreach (array_intersect_key(self::STICKYNESS_RULES, $candidates) as $candidate => $stickyRule) {
                     [$stickyName, $stickyVersion] = explode(':', $stickyRule, 2) + [1 => null];
-                    if (!isset($allPackages[$stickyName]) || (!$dev && isset($devPackages[$stickyName]))) {
+                    if (!isset($allPackages[$stickyName]) || ($isProject && !$dev && isset($devPackages[$stickyName]))) {
                         continue;
                     }
                     if (null !== $stickyVersion && !$repo->findPackage($stickyName, $versionParser->parseConstraints($stickyVersion))) {
@@ -293,14 +303,17 @@ EOPHP
                 foreach (current($candidates) as $dep) {
                     if (isset(self::PROVIDE_RULES[$dep])) {
                         $abstractions[] = $dep;
-                    } elseif (!isset($allPackages[$dep]) || (!$dev && isset($devPackages[$dep]))) {
+                    } elseif (!isset($allPackages[$dep])) {
                         $missingRequires[$dev][$abstraction][] = $dep;
+                    } elseif ($isProject && !$dev && isset($devPackages[$dep])) {
+                        $missingRequires[0][$abstraction][] = $dep;
+                        $missingRequires[2][$abstraction][] = $dep;
                     }
                 }
             }
         }
 
-        if (!isset($allPackages['nyholm/psr7'])) {
+        if (!isset($allPackages['nyholm/psr7']) && !isset($allPackages['php-http/discovery'])) {
             foreach ($missingRequires as $dev => $abstractions) {
                 if (\in_array('nyholm/psr7', $missingRequires[$dev]['psr/http-factory-implementation'] ?? [], true)) {
                     continue;
@@ -328,7 +341,11 @@ EOPHP
 
         foreach ($missingRequires as $key => $packages) {
             foreach ($packages as $package => $constraint) {
-                $manipulator->addLink($key, $package, $constraint, $sortPackages);
+                if ('remove' === $key) {
+                    $manipulator->removeSubNode('require-dev', $package);
+                } else {
+                    $manipulator->addLink($key, $package, $constraint, $sortPackages);
+                }
             }
         }
 

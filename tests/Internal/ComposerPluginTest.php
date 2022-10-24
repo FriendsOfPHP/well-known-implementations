@@ -24,7 +24,7 @@ class ComposerPluginTest extends TestCase
     {
         $plugin = new ComposerPlugin();
 
-        $this->assertSame($expected, $plugin->getMissingRequires($repo, [$rootRequires, $rootDevRequires]));
+        $this->assertSame($expected, $plugin->getMissingRequires($repo, [$rootRequires, $rootDevRequires], true));
     }
 
     public function provideMissingRequires()
@@ -32,7 +32,7 @@ class ComposerPluginTest extends TestCase
         $link = new Link('source', 'target', new Constraint(Constraint::STR_OP_GE, '1'));
         $repo = new InstalledArrayRepository([]);
 
-        yield 'empty' => [[[], []], $repo, [], []];
+        yield 'empty' => [[[], [], []], $repo, [], []];
 
         $rootRequires = [
             'php-http/async-client-implementation' => $link,
@@ -46,7 +46,7 @@ class ComposerPluginTest extends TestCase
             'psr/http-factory-implementation' => [
                 'nyholm/psr7',
             ],
-        ], []];
+        ], [], []];
 
         yield 'async-httplug' => [$expected, $repo, $rootRequires, []];
     }
