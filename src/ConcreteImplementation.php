@@ -24,6 +24,7 @@ class ConcreteImplementation
     public const VENDOR_HTTPLUG_CURL = 'HttplugCurl';
     public const VENDOR_HTTPLUG_GUZZLE6 = 'HttplugGuzzle6';
     public const VENDOR_HTTPLUG_GUZZLE7 = 'HttplugGuzzle7';
+    public const VENDOR_HTTPLUG_MOCK = 'HttplugMock';
     public const VENDOR_HTTPLUG_REACT = 'HttplugReact';
     public const VENDOR_LAMINAS = 'Laminas';
     public const VENDOR_NYHOLM = 'Nyholm';
@@ -50,6 +51,7 @@ class ConcreteImplementation
             'HttplugGuzzle6' => 'php-http/guzzle6-adapter',
             'HttplugCurl' => 'php-http/curl-client',
             'HttplugReact' => 'php-http/react-adapter',
+            'HttplugMock' => 'php-http/mock-client',
         ],
     ];
 
@@ -63,7 +65,10 @@ class ConcreteImplementation
                 continue;
             }
             foreach ([false, true] as $includeDevRequirements) {
-                foreach ($packages as $namespace => $versions) {
+                foreach ($packages as $vendor => $versions) {
+                    if ('HttplugMock' === $vendor && !$includeDevRequirements) {
+                        continue;
+                    }
                     foreach ((array) $versions as $package => $version) {
                         if (\is_int($package)) {
                             $package = $version;
@@ -76,7 +81,7 @@ class ConcreteImplementation
                             continue 2;
                         }
                     }
-                    \define(__NAMESPACE__."\\{$const}_VENDOR", $namespace);
+                    \define(__NAMESPACE__."\\{$const}_VENDOR", $vendor);
                     continue 3;
                 }
             }

@@ -381,7 +381,7 @@ EOPHP
                 continue;
             }
             foreach ([false, true] as $includeDevRequirements) {
-                foreach ($packages as $namespace => $versions) {
+                foreach ($packages as $vendor => $versions) {
                     foreach ((array) $versions as $package => $version) {
                         if (\is_int($package)) {
                             $package = $version;
@@ -394,7 +394,7 @@ EOPHP
                             continue 2;
                         }
                     }
-                    \define(__NAMESPACE__."\\{$const}_VENDOR", $namespace);
+                    \define(__NAMESPACE__."\\{$const}_VENDOR", $vendor);
                     continue 3;
                 }
             }
