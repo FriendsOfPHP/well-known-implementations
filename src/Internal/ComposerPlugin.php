@@ -55,12 +55,14 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             'guzzlehttp/guzzle' => [],
         ],
         'psr/http-factory-implementation' => [
+            'ext-phalcon' => [],
             'nyholm/psr7' => [],
             'guzzlehttp/psr7' => [],
             'slim/psr7' => [],
             'laminas/laminas-diactoros' => [],
         ],
         'psr/http-message-implementation' => [
+            'ext-phalcon' => [],
             'nyholm/psr7' => [],
             'guzzlehttp/psr7' => [],
             'slim/psr7' => [],
@@ -246,6 +248,9 @@ EOPHP
                 $abstractions[] = $abstraction = key($rules);
 
                 foreach (array_shift($rules) as $candidate => $deps) {
+                    if (0 === strpos($candidate, 'ext-') && \extension_loaded(substr($candidate, 4))) {
+                        $missingRequires[$dev][$abstraction] = [];
+                    }
                     if (!isset($allPackages[$candidate])) {
                         continue;
                     }
@@ -280,6 +285,12 @@ EOPHP
                 $candidates = self::PROVIDE_RULES[$abstraction];
 
                 foreach ($candidates as $candidate => $deps) {
+                    if (0 === strpos($candidate, 'ext-')) {
+                        if (\extension_loaded(substr($candidate, 4))) {
+                            continue 2;
+                        }
+                        unset($candidates[$candidate]);
+                    }
                     if (isset($allPackages[$candidate]) && (!$isProject || $dev || !isset($devPackages[$candidate]))) {
                         continue 2;
                     }
@@ -386,6 +397,12 @@ EOPHP
                         if (\is_int($package)) {
                             $package = $version;
                             $version = null;
+                        }
+                        if (0 === strpos($package, 'ext-')) {
+                            if (\extension_loaded(substr($package, 4))) {
+                                break;
+                            }
+                            continue 2;
                         }
                         if (!$includeDevRequirements && \in_array($package, $repo->getDevPackageNames(), true)) {
                             continue 2;

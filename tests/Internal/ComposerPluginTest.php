@@ -43,10 +43,11 @@ class ComposerPluginTest extends TestCase
                 'guzzlehttp/promises',
                 'php-http/message-factory',
             ],
-            'psr/http-factory-implementation' => [
-                'nyholm/psr7',
-            ],
         ], [], []];
+
+        if (!\extension_loaded('phalcon')) {
+            $expected[0]['psr/http-factory-implementation'] = ['nyholm/psr7'];
+        }
 
         yield 'async-httplug' => [$expected, $repo, $rootRequires, []];
     }

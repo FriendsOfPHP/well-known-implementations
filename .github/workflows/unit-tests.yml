@@ -20,9 +20,6 @@ jobs:
   tests:
     name: Tests
 
-    env:
-      extensions: curl,mbstring
-
     strategy:
       matrix:
         php:
@@ -49,6 +46,9 @@ jobs:
           - php: '7.2'
             client: php-http/react-adapter
             psr7: nyholm/psr7
+          - php: '7.2'
+            client: symfony/http-client
+            psr7: phalcon
       fail-fast: false
 
     runs-on: ubuntu-22.04
@@ -65,13 +65,17 @@ jobs:
           coverage: "none"
           ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,zend.assertions=1
           php-version: "${{ matrix.php }}"
-          extensions: "${{ env.extensions }}"
+          extensions: "curl,mbstring${{ matrix.psr7 == 'phalcon' && ',psr-1.1.0,phalcon-4.0.6' }}"
 
       - name: Install dependencies
         run: |
           echo "::group::composer update"
-          composer remove --ansi --no-update --dev nyholm/psr7
-          composer require --ansi --no-update guzzlehttp/promises php-http/message-factory ${{ matrix.psr7 }} ${{ matrix.client }}
+          if [ '${{ matrix.psr7 }}' = 'phalcon' ]; then
+            composer require --ansi --no-update guzzlehttp/promises php-http/message-factory ${{ matrix.client }}
+          else
+            composer remove --ansi --no-update --dev nyholm/psr7
+            composer require --ansi --no-update guzzlehttp/promises php-http/message-factory ${{ matrix.client }} ${{ matrix.psr7 }}
+          fi
           composer update --ansi
           echo "::endgroup::"
 

@@ -28,6 +28,7 @@ class ConcreteImplementation
     public const VENDOR_HTTPLUG_REACT = 'HttplugReact';
     public const VENDOR_LAMINAS = 'Laminas';
     public const VENDOR_NYHOLM = 'Nyholm';
+    public const VENDOR_PHALCON = 'Phalcon';
     public const VENDOR_SLIM = 'Slim';
     public const VENDOR_SYMFONY = 'Symfony';
 
@@ -36,6 +37,7 @@ class ConcreteImplementation
      */
     public const IMPLEMENTATIONS = [
         'PSR7' => [
+            'Phalcon' => 'ext-phalcon',
             'Nyholm' => 'nyholm/psr7',
             'Guzzle' => ['guzzlehttp/psr7' => '1.4'],
             'Slim' => 'slim/psr7',
@@ -73,6 +75,12 @@ class ConcreteImplementation
                         if (\is_int($package)) {
                             $package = $version;
                             $version = null;
+                        }
+                        if (0 === strpos($package, 'ext-')) {
+                            if (\extension_loaded(substr($package, 4))) {
+                                break;
+                            }
+                            continue 2;
                         }
                         if (!InstalledVersions::isInstalled($package, $includeDevRequirements)) {
                             continue 2;
