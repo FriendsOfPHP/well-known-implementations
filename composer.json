@@ -1,7 +1,7 @@
 {
     "name": "friendsofphp/well-known-implementations",
     "description": "",
-    "type": "composer-plugin",
+    "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/FriendsOfPHP/well-known-implementations",
     "authors": [
@@ -10,22 +10,12 @@
             "email": "p@tchwork.com"
         }
     ],
-    "provide": {
-        "php-http/async-client-implementation": "*",
-        "php-http/client-implementation": "*",
-        "psr/http-client-implementation": "*",
-        "psr/http-factory-implementation": "*",
-        "psr/http-message-implementation": "*"
-    },
     "require": {
-        "php": ">=7.2",
-        "composer-plugin-api": "^2.1",
-        "composer-runtime-api": "^2.1"
+        "php": ">=7.1",
+        "php-http/discovery": "^1.15"
     },
     "require-dev": {
-        "composer/composer": "^2.1",
         "nyholm/psr7": "^1",
-        "php-http/discovery": "^1",
         "php-http/httplug": "^1|^2",
         "psr/http-client": "^1",
         "psr/http-factory": "^1",
@@ -43,13 +33,24 @@
         "laminas/laminas-diactoros": "<2",
         "php-http/curl-client": "<2",
         "php-http/react-adapter": "<3",
-        "symfony/http-client": "<5.4"
+        "symfony/http-client": "<4.4"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "extra": {
-        "class": "FriendsOfPHP\\WellKnownImplementations\\Internal\\ComposerPlugin"
+        "branch-alias": {
+            "dev-main": "1.1-dev"
+        }
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "~/Code/php-http/discovery"
+        }
+    ],
     "minimum-stability": "dev"
 }
